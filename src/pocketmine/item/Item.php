@@ -1139,6 +1139,7 @@ class Item{
 		Item::addCreativeItem(Item::get(Item::LEVER));
 		Item::addCreativeItem(Item::get(Item::REDSTONE_LAMP));
 		Item::addCreativeItem(Item::get(Item::REDSTONE_TORCH));
+		
 		Item::addCreativeItem(Item::get(Item::WOODEN_PRESSURE_PLATE));
 		Item::addCreativeItem(Item::get(Item::STONE_PRESSURE_PLATE));
 		Item::addCreativeItem(Item::get(Item::LIGHT_WEIGHTED_PRESSURE_PLATE));
