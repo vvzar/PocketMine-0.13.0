@@ -22,44 +22,71 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\level\Level;
 use pocketmine\Player;
-use pocketmine\Server;
-use pocketmine\entity\Entity;
 
-class NetherPortal extends Flowable{
-	protected $id = self::NETHER_PORTAL;
+class TripwireHook extends Flowable{
+	protected $id = self::TRIPWIRE_HOOK;
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
 	}
 
-	public function getLightLevel(){
-		return 15;
+	public function getHardness(){
+		return 0;
 	}
 
-	public function getName(){
-		return "Nether Portal";
-	}
-
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		$this->getLevel()->setBlock($block, $this, true, true);
+	public function isSolid(){
 		return false;
 	}
 
-	public function getDrops(Item $item){
-		return;
+	public function getName(){
+		return "Tripwire Hook";
+	}
+
+	public function getBoundingBox(){
+		return null;
+	}
+
+	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+		if($face !== 0){
+			$faces = [2 => 0,3 => 1,4 => 2,5 => 3];
+			if(!isset($faces[$face])){
+				return false;
+			}
+			else{
+				$this->meta = $faces[$face];
+				$this->getLevel()->setBlock($block, Block::get(Block::TRIPWIRE_HOOK, $this->meta), true);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	public function onUpdate($type){
+		$faces = [2 => 3,3 => 2,4 => 5,5 => 4];
+		if($type === Level::BLOCK_UPDATE_NORMAL){
+			if(isset($faces[$this->meta])){
+				if($this->getSide($faces[$this->meta])->isTransparent() === true){
+					$this->getLevel()->useBreakOn($this);
+				}
+				return Level::BLOCK_UPDATE_NORMAL;
+			}
+		}
+		return false;
 	}
 
 	public function onBreak(Item $item){
 		$this->getLevel()->setBlock($this, new Air(), true, true);
+		
 		return true;
 	}
+
+	public function getDrops(Item $item){
+		return [
+			[Item::TRIPWIRE_HOOK, 0, 1],
+		];
+	}
 	
-	public function onEntityCollide(Entity $entity){
-        //Server::getInstance()->getPluginManager()->callEvent($ev = new EntityEnterPortalEvent($this, $entity));
-        //if(!$ev->isCancelled()) {
-            //TODO: Delayed teleport entity to nether world.
-        //}
-        return true;
-    }
 }
